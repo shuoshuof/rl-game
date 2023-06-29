@@ -16,13 +16,15 @@ from torch.utils.tensorboard import SummaryWriter
 import imageio
 def state_transformer(state):
     # 保证双方的状态都是对等的
-    p0_state = state[:6]
-    p1_state = state[0:4]+state[6:]
+    bx, by, v_x, v_y, p0_x, p0_y, p1_x, p1_y =state
+    p0_state = state[1-bx,1-by,-v_x,-v_y,1-p0_x,1-p0_y]
+    p1_state = state[bx, by, v_x, v_y,p1_x, p1_y]
     return np.array(p0_state),np.array(p1_state)
 def action_transformer(p0_action_idx,p1_action_idx):
-    idx2action = [[0,-1],[0,1],[-1,0],[1,0],[0,0]]
-    p0_action = idx2action[p0_action_idx]
-    p1_action = idx2action[p1_action_idx]
+    idx2action_1 = [[0,-1],[0,1],[-1,0],[1,0],[0,0]]
+    idx2action_0 = [[0, 1], [0, -1], [1, 0], [-1, 0], [0, 0]]
+    p0_action = idx2action_0[p0_action_idx]
+    p1_action = idx2action_1[p1_action_idx]
     return p0_action,p1_action
 def controler(draw):
     if win32api.GetKeyState(ord('J')) < 0:

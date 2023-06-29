@@ -35,6 +35,7 @@ class racket:
         self.W = W
         self.update_Collision_domain()
         self.reward =0
+        self.num_beat=0
     def update_Collision_domain(self):
         self.pt_lt = (int(self.x-self.w//2),int(self.y-self.r//2))
         self.pt_rb = (int(self.x+self.w//2),int(self.y+self.r//2))
@@ -52,6 +53,7 @@ class racket:
 
         if self.pt_lt[0] <= bx and bx <= self.pt_rb[0] and self.pt_lt[1] <= by and by <= self.pt_rb[1] and belong==self.player_id:
             self.get_reward()
+            self.num_beat+=1
             return True
         else:
             return False
@@ -96,7 +98,7 @@ class Environment:
 
         reward = self.collision_detect()
         done =False
-        if max(self.point_score)>20:
+        if max(self.point_score)>20 or self.player0.num_beat>20 or self.player1.num_beat>20:
             done = True
         self.frame+=1
         return img,next_state,done,reward,self.frame
