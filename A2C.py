@@ -102,3 +102,19 @@ class ActorCritic:
     def save(self,dir):
         torch.save(self.actor.state_dict(),dir+'/actor.pth')
         torch.save(self.critic.state_dict(),dir+'/critic.pth')
+    def load(self,dir):
+        self.actor.load_state_dict(torch.load(dir+'/actor.pth'))
+        self.critic.load_state_dict(torch.load(dir+'/critic.pth'))
+if __name__ == '__main__':
+    actor_lr = 1e-4
+    critic_lr = 1e-4
+    num_episodes = 100000
+    hidden_dim = 128
+    gamma = 0.98
+    device = torch.device("cuda") if torch.cuda.is_available() else torch.device(
+        "cpu")
+    state_dim = 6 # (bx,by,vx,vy,px,py)
+    action_dim = 5 # (上，下，左，右，静止)
+    agent = ActorCritic(state_dim, hidden_dim, action_dim, actor_lr, critic_lr,
+                        gamma, device)
+    agent.load('./models')

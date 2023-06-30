@@ -24,7 +24,7 @@ class ball:
         self.v_x+=random.uniform(-0.2,0.2)
         self.belong = 1-self.belong
 class racket:
-    def __init__(self,player_id,x,y,R,W,r=5,w=15):
+    def __init__(self,player_id,x,y,R,W,r=3,w=12):
         self.player_id = player_id
         self.x= x
         self.y= y
@@ -58,7 +58,7 @@ class racket:
         else:
             return False
 class Environment:
-    def __init__(self,b_r=120,b_w=80):
+    def __init__(self,b_r=80,b_w=60):
         self.r = b_r
         self.w = b_w
         # self.player0_color = 255
@@ -75,7 +75,7 @@ class Environment:
         self.frame =0
     def ball_init(self):
         b_vx = random.uniform(-1,1)
-        self.ball = ball(r=3,x=self.w//2,y=5,v_x=b_vx,v_y=-1)
+        self.ball = ball(r=2,x=self.w//2,y=5,v_x=b_vx,v_y=-1)
     def reset(self):
         self.Init()
     def get_state(self):
@@ -157,8 +157,8 @@ def control():
 def state_transformer(state):
     # 保证双方的状态都是对等的
     bx, by, v_x, v_y, p0_x, p0_y, p1_x, p1_y =state
-    p0_state = state[1-bx,1-by,-v_x,-v_y,1-p0_x,1-p0_y]
-    p1_state = state[bx, by, v_x, v_y,p1_x, p1_y]
+    p0_state = [1-bx,1-by,-v_x,-v_y,1-p0_x,1-p0_y]
+    p1_state = [bx, by, v_x, v_y,p1_x, p1_y]
     return np.array(p0_state),np.array(p1_state)
 def action_transformer(p0_action_idx,p1_action_idx):
     idx2action_1 = [[0,-1],[0,1],[-1,0],[1,0],[0,0]]
@@ -182,14 +182,14 @@ if __name__ == "__main__":
     while True:
         state = env.get_state()
         p0_state, p1_state = state_transformer(state)
-
+        #print(p1_state)
         action = control()
         img,next_state, done,reward,frame = env.update([0,0],action,draw=True)
 
         p0_reward, p1_reward = reward
 
         total_reward += p1_reward
-        #print(total_reward)
+        print(total_reward)
         # print(p1_state)
         if done:
             print(frame)

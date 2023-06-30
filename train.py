@@ -79,18 +79,13 @@ def train(env,agent,num_episodes,writer):
             agent.update(transition_dict)
             pbar.update(1)
             if (episode + 1) % 10 == 0:
-                # pbar.set_postfix({
-                #     'episode':
-                #     '%d' % episode,
-                #     'reward':
-                #     '%.3f' % np.mean(reward_list[-10:])
-                # })
                 pbar.set_postfix({
                     'episode':
                     '%d' % episode,
                     'reward':
-                    '%.3f' % np.mean(frame_num_list[-10:])
+                    '%.3f' % np.mean(reward_list[-10:])
                 })
+
                 writer.add_scalars('reward',
                                    tag_scalar_dict={'reward':np.mean(reward_list[-10:]),},
                                    global_step=episode+1)
@@ -98,17 +93,15 @@ def train(env,agent,num_episodes,writer):
                                    tag_scalar_dict={'frame':np.mean(frame_num_list[-10:]),},
                                    global_step=episode+1)
 
-            if (episode+1)%1000==0:
-
-                writer.add_scalars('avg_reward',
-                                   tag_scalar_dict={'reward': np.mean(reward_list[-1000:]), },
-                                   global_step=(episode + 1)/1000)
             if (episode+1)%100==0:
                 save_git(env, agent, episode + 1)
                 writer.add_scalars('avg_frame',
                                    tag_scalar_dict={'frame': np.mean(frame_num_list[-100:]), },
                                    global_step=episode + 1)
                 agent.save(dir='./models')
+                writer.add_scalars('avg_reward',
+                                   tag_scalar_dict={'reward': np.mean(reward_list[-100:]), },
+                                   global_step=(episode + 1)/100)
 
 if __name__ =='__main__':
     actor_lr = 1e-4
@@ -127,6 +120,6 @@ if __name__ =='__main__':
     action_dim = 5 # (上，下，左，右，静止)
     agent = ActorCritic(state_dim, hidden_dim, action_dim, actor_lr, critic_lr,
                         gamma, device)
-
+    agent.load('./models')
 
     train(env,agent,num_episodes,writer)
